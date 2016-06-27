@@ -1,24 +1,56 @@
-var tls = require('tls');
-var fs = require('fs');
+var fs = require('fs'); 
+var https = require('https'); 
+var express = require('express');
+var bodyParser = require('body-parser');
 
-var options = {
-  key: fs.readFileSync('ssl/ssl-key.pem'),
-  cert: fs.readFileSync('ssl/ssl-cert.pem'),
+var port = process.env.PORT || 4433;
 
-  // This is necessary only if using the client certificate authentication.
-  requestCert: true,
+var options = { 
+    key: fs.readFileSync('ssl/server-key.pem'), 
+    cert: fs.readFileSync('ssl/server-crt.pem'), 
+    ca: fs.readFileSync('ssl/ca-crt.pem'), 
+    requestCert: true, 
+    rejectUnauthorized: true
+}; 
 
-  // This is necessary only if the client uses the self-signed certificate.
-  ca: [ fs.readFileSync('ssl/ssl-cert.pem') ]
-};
-
-var server = tls.createServer(options, function(socket) {
-  console.log('server connected',
-              socket.authorized ? 'authorized' : 'unauthorized');
-  socket.write("welcome!\n");
-  socket.setEncoding('utf8');
-  socket.pipe(socket);
+var app = express();
+var server = require('https').createServer(options, app);
+server.listen(port, function(){
+  console.log('Server listening on port %d', port);
 });
-server.listen(8008, function() {
-  console.log('server bound');
+
+// Routing
+app.use(bodyParser.json())
+//app.use(express.static(__dirname + '/public'));
+
+
+/*
+https.createServer(options, function (req, res) { 
+    console.log(new Date()+' '+ 
+        req.connection.remoteAddress+' '+ 
+        req.socket.getPeerCertificate().subject.CN+' '+ 
+        req.method+' '+req.url); 
+    
+    res.socket.setEncoding('utf8');
+  
+    res.writeHead(200); 
+    res.end('Success;' +new Date() + '\n'); 
+}).listen(4433);
+*/
+
+
+
+
+// routes
+app.get('/hey', function(req, res) {
+    res.send('HEY!');
+});
+app.post('/ho', function(req, res) { 
+    console.log(new Date()+' '+ 
+        req.connection.remoteAddress+' '+ 
+        req.socket.getPeerCertificate().subject.CN+' '+ 
+        req.method+' '+req.url); 
+      
+    //res.writeHead(200); 
+    res.send('Success;' +new Date() + '\n'); 
 });

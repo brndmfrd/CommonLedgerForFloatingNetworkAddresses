@@ -45,3 +45,6 @@ $RECYCLE.BIN/
 Network Trash Folder
 Temporary Items
 .apdisk
+
+# Ignore packages installed by NPM
+node_modules
