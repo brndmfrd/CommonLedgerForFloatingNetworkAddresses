@@ -4,7 +4,7 @@ var https = require('https');
 var options = { 
     hostname: 'localhost', 
     port: 4433, 
-    path: '/ho', 
+    path: '/api/post/addy/update', 
     method: 'POST', 
     key: fs.readFileSync('ssl/client1-key.pem'), 
     cert: fs.readFileSync('ssl/client1-crt.pem'), 

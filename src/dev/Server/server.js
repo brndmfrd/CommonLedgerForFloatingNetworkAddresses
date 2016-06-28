@@ -2,6 +2,7 @@ var fs = require('fs');
 var https = require('https'); 
 var express = require('express');
 var bodyParser = require('body-parser');
+var Post = require('./models/post');
 
 var port = process.env.PORT || 4433;
 
@@ -21,36 +22,28 @@ server.listen(port, function(){
 
 // Routing
 app.use(bodyParser.json())
-//app.use(express.static(__dirname + '/public'));
 
-
-/*
-https.createServer(options, function (req, res) { 
-    console.log(new Date()+' '+ 
-        req.connection.remoteAddress+' '+ 
-        req.socket.getPeerCertificate().subject.CN+' '+ 
-        req.method+' '+req.url); 
-    
-    res.socket.setEncoding('utf8');
-  
-    res.writeHead(200); 
-    res.end('Success;' +new Date() + '\n'); 
-}).listen(4433);
-*/
-
-
-
-
-// routes
-app.get('/hey', function(req, res) {
-    res.send('HEY!');
-});
-app.post('/ho', function(req, res) { 
+app.post('/api/post/addy/update', function(req, res) { 
     console.log(new Date()+' '+ 
         req.connection.remoteAddress+' '+ 
         req.socket.getPeerCertificate().subject.CN+' '+ 
         req.method+' '+req.url); 
       
-    //res.writeHead(200); 
-    res.send('Success;' +new Date() + '\n'); 
+    var post = new Post({
+        clientName:req.socket.getPeerCertificate().subject.CN,
+        clientAddress:req.connection.remoteAddress
+    });
+
+    post.save(function(err, post){
+        if(err){
+            return next(err)
+        }
+        //res.status(201).json(post)
+        
+        res.send('Success;' +
+            new Date() + ';' +
+            req.socket.getPeerCertificate().subject.CN + ';' +
+            req.connection.remoteAddress + ';' +
+            '\n');
+    });
 });
